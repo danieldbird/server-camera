@@ -1,0 +1,50 @@
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    command: serve
+    volumes:
+      - './data:/data'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    environment:
+      - 'TZ=Pacific/Auckland'
+      - 'LOG_LEVEL=info'
+      - 'LOG_JSON=false'
+      - 'DIUN_WATCH_WORKERS=20'
+      - 'DIUN_WATCH_SCHEDULE=0 */6 * * *'
+      - 'DIUN_WATCH_JITTER=30s'
+      - 'DIUN_PROVIDERS_DOCKER=true'
+      - 'DIUN_NOTIF_SLACK_WEBHOOKURL=https://hooks.slack.com/services/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'
+      - 'DIUN_NOTIF_SLACK_RENDERFIELDS=true'
+      - 'DIUN_NOTIF_SLACK_TEMPLATEBODY=Camera Server: Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.'
+    labels:
+      - 'diun.enable=true'
+    restart: always
+
+  frigate:
+    container_name: frigate
+    image: blakeblackshear/frigate:stable-amd64
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/danieldbird/Dockers/frigate/config.yaml:/config/config.yaml:ro
+      - /home/danieldbird/Dockers/frigate/storage:/media/frigate
+    ports:
+      - 5000:5000
+      - 1935:1935
+    environment:
+      FRIGATE_RTSP_PASSWORD: 'password'
+
+  ntp-server:
+    container_name: ntp-server
+    restart: always
+    read_only: true
+    ports:
+      - '123:123/udp'
+    tmpfs:
+      - /etc/chrony:rw,mode=1750
+      - /run/chrony:rw,mode=1750
+      - /var/lib/chrony:rw,mode=1750
+    image: cturra/ntp
+    environment:
+      NTP_SERVERS: '0.nz.pool.ntp.org,1.nz.pool.ntp.org,2.nz.pool.ntp.org,3.nz.pool.ntp.org'
