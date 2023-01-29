@@ -1,25 +1,26 @@
 services:
   diun:
-    image: crazymax/diun:latest
     container_name: diun
     command: serve
     volumes:
       - './data:/data'
       - '/var/run/docker.sock:/var/run/docker.sock'
     environment:
-      - 'TZ=Pacific/Auckland'
-      - 'LOG_LEVEL=info'
-      - 'LOG_JSON=false'
-      - 'DIUN_WATCH_WORKERS=20'
-      - 'DIUN_WATCH_SCHEDULE=0 0 * * *'
-      - 'DIUN_WATCH_JITTER=30s'
-      - 'DIUN_PROVIDERS_DOCKER=true'
-      - 'DIUN_NOTIF_SLACK_WEBHOOKURL=$DIUN_NOTIF_SLACK_WEBHOOKURL'
-      - 'DIUN_NOTIF_SLACK_RENDERFIELDS=true'
-      - 'DIUN_NOTIF_SLACK_TEMPLATEBODY=Camera Server: Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released.'
+      - TZ=Pacific/Auckland
+      - LOG_LEVEL=info
+      - LOG_JSON=false
+      - DIUN_WATCH_WORKERS=20
+      - DIUN_WATCH_SCHEDULE=0 0 * * *
+      - DIUN_WATCH_JITTER=30s
+      - DIUN_PROVIDERS_DOCKER=true
+      - DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true
+      - DIUN_NOTIF_SLACK_WEBHOOKURL=$DIUN_NOTIF_SLACK_WEBHOOKURL
+      - DIUN_NOTIF_SLACK_RENDERFIELDS=true
+
     labels:
-      - 'diun.enable=true'
+      - diun.enable=true
     restart: always
+    image: crazymax/diun:latest
 
   frigate:
     container_name: frigate
@@ -33,7 +34,7 @@ services:
       - 5000:5000
       - 1935:1935
     environment:
-      FRIGATE_RTSP_PASSWORD: 'password'
+      FRIGATE_RTSP_PASSWORD: $FRIGATE_RTSP_PASSWORD
 
   ntp-server:
     container_name: ntp-server
