@@ -24,11 +24,11 @@ services:
 
   frigate:
     container_name: frigate
-    image: blakeblackshear/frigate:stable-amd64
+    image: ghcr.io/blakeblackshear/frigate:stable
     restart: always
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /home/danieldbird/Dockers/frigate/config.yaml:/config/config.yaml:ro
+      - /home/danieldbird/Dockers/frigate/config.yaml:/config/config.yaml
       - /home/danieldbird/Dockers/frigate/storage:/media/frigate
     ports:
       - 5000:5000
